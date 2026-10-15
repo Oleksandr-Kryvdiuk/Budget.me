@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- lang="uk" підказує браузеру, що сторінка українською -->
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <!-- Цей рядок потрібен, щоб сторінка нормально виглядала на телефоні -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мій трекер</title>
+  <!-- Іконка вкладки браузера (емодзі гаманця) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+  <!-- Підключаємо файл зі стилями (зовнішній вигляд) -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="page-header">
+    <h1>Мій трекер</h1>
+    <p class="subtitle">Бюджет</p>
+  </header>
+
+  <main class="container">
+
+    <!-- ===== Блок 1: Поточний баланс ===== -->
+    <section class="card balance-card">
+      <p class="label">Поточний баланс</p>
+      <!-- Сюди JavaScript підставить суму. id потрібен, щоб знайти цей елемент у коді -->
+      <p id="balance" class="balance">0,00 ₴</p>
+    </section>
+
+    <!-- ===== Блок 2: Форма додавання запису ===== -->
+    <section class="card">
+      <h2>Новий запис</h2>
+
+      <form id="record-form">
+        <!-- Перемикач «Витрата / Дохід». Це радіокнопки: вибрати можна лише одну -->
+        <div class="type-switch">
+          <label>
+            <input type="radio" name="type" value="expense" checked>
+            <span>Витрата</span>
+          </label>
+          <label>
+            <input type="radio" name="type" value="income">
+            <span>Дохід</span>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Сума, ₴</span>
+            <!-- inputmode="decimal" відкриває на телефоні цифрову клавіатуру -->
+            <input type="number" id="amount" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" required>
+          </label>
+
+          <label class="field">
+            <span>Категорія</span>
+            <!-- Список категорій заповнює JavaScript (він різний для доходів і витрат) -->
+            <select id="category" required></select>
+          </label>
+
+          <label class="field">
+            <span>Дата</span>
+            <input type="date" id="date" required>
+          </label>
+
+          <label class="field">
+            <span>Коментар</span>
+            <input type="text" id="comment" maxlength="100" placeholder="Необов'язково">
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary">Додати</button>
+      </form>
+    </section>
+
+    <!-- ===== Блок 3: Підсумки за місяць ===== -->
+    <section class="card">
+      <div class="card-header">
+        <h2>Підсумки за місяць</h2>
+        <!-- Поле для вибору місяця -->
+        <input type="month" id="month">
+      </div>
+
+      <div class="month-totals">
+        <div>
+          <p class="label">Доходи</p>
+          <p id="month-income" class="amount income">0,00 ₴</p>
+        </div>
+        <div>
+          <p class="label">Витрати</p>
+          <p id="month-expense" class="amount expense">0,00 ₴</p>
+        </div>
+      </div>
+
+      <h3>Витрати по категоріях</h3>
+      <!-- Сюди JavaScript додасть рядки з категоріями -->
+      <ul id="category-list" class="category-list"></ul>
+    </section>
+
+    <!-- ===== Блок 4: Список усіх записів ===== -->
+    <section class="card">
+      <h2>Усі записи</h2>
+      <ul id="record-list" class="record-list"></ul>
+    </section>
+
+  </main>
+
+  <!-- Підключаємо файл з логікою. Він стоїть в кінці, щоб на момент запуску
+       вся сторінка вище вже була завантажена -->
+  <script src="budget.js"></script>
+</body>
+</html>
