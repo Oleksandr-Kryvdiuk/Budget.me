@@ -1,355 +1,897 @@
 /* =========================================================
-   Colors and sizes are stored in "variables" (--name).
-   To change a color everywhere at once, just change it here.
+   Budget.me — pixel + neo-brutalist style
+   Thick black borders, hard shadows, a pixel font and bright
+   color blocks. Colors live in variables (--name), so the
+   whole look can be changed in one place.
    ========================================================= */
+
 :root {
-  --bg: #f4f5f7;          /* page background */
-  --card: #ffffff;        /* card background */
-  --text: #1f2328;        /* main text */
-  --muted: #6b7280;       /* gray secondary text */
-  --border: #e3e5e8;      /* lines and borders */
-  --accent: #3b6fd8;      /* main color (buttons) */
-  --income: #1f8a4c;      /* green for income */
-  --expense: #d0453a;     /* red for expenses */
-  --radius: 12px;         /* corner rounding */
+  /* Fonts */
+  --font-pixel: "Press Start 2P", "Courier New", monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  /* Theme colors — light "paper" theme */
+  --paper: #f3efe4;                 /* page background */
+  --grid: rgba(20, 20, 20, 0.07);   /* graph-paper lines */
+  --card: #fffdf7;                  /* card background */
+  --field: #ffffff;                 /* inputs, chips, tiles */
+  --text: #141414;                  /* main text */
+  --muted: #5d5a52;                 /* gray secondary text */
+  --line: #141414;                  /* borders */
+  --soft-line: rgba(20, 20, 20, 0.18);
+  --shadow: #141414;                /* hard shadows */
+  --focus: #6b4eff;                 /* keyboard focus outline */
+
+  /* Accent colors — the same in both themes */
+  --lime: #c4f25a;
+  --pink: #ff7aa8;
+  --yellow: #ffd23f;
+  --violet: #b9a8ff;
+  --purple: #6b4eff;
+  --ink: #141414;                   /* text on accent colors */
+
+  --border: 3px solid var(--line);
+
+  /* Lets the browser draw its own controls (date picker, scrollbars) to match the theme */
+  color-scheme: light dark;
 }
 
-/* Dark theme: turns on automatically if the device uses dark mode */
+/* Dark "cyber" theme: turns on automatically if the device uses dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #121417;
-    --card: #1c1f24;
-    --text: #e8eaed;
-    --muted: #9aa0a6;
-    --border: #2e3238;
-    --accent: #6d9bff;
-    --income: #4cc27f;
-    --expense: #ff6f61;
+    --paper: #10110d;
+    --grid: rgba(196, 242, 90, 0.07);
+    --card: #1b1c17;
+    --field: #10110d;
+    --text: #f1eee4;
+    --muted: #a6a294;
+    --line: #f1eee4;
+    --soft-line: rgba(241, 238, 228, 0.2);
+    --shadow: #c4f25a;
+    --focus: #c4f25a;
   }
 }
 
-/* box-sizing: border-box — so that inner padding doesn't make elements bigger */
+/* box-sizing: border-box — so that borders and padding don't make elements bigger */
 * {
   box-sizing: border-box;
 }
 
+/* Elements with the "hidden" attribute must stay hidden, whatever other styles say */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.4;
+  background-color: var(--paper);
+  /* Graph paper: two sets of thin lines (horizontal and vertical) every 24px */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-/* ---------- Header ---------- */
-.page-header {
-  text-align: center;
-  padding: 24px 16px 8px;
+/* Clear dashed outline when you move around with the Tab key */
+:focus-visible {
+  outline: 3px dashed var(--focus);
+  outline-offset: 3px;
 }
 
-.page-header h1 {
+p {
   margin: 0;
-  font-size: 1.6rem;
 }
 
-.subtitle {
-  margin: 4px 0 0;
+.muted {
   color: var(--muted);
+  font-size: 13px;
 }
 
-/* ---------- Main container ---------- */
 /* max-width keeps the page from stretching too wide on big screens */
-.container {
-  max-width: 720px;
+.app {
+  max-width: 760px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 16px 16px 40px;
+}
+
+
+/* ---------- Top bar ---------- */
+.topbar {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* ---------- Cards (the white blocks) ---------- */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-}
-
-.card h2 {
-  margin: 0 0 16px;
-  font-size: 1.15rem;
-}
-
-.card h3 {
-  margin: 20px 0 8px;
-  font-size: 1rem;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0 20px;
 }
 
-.card-header h2 {
-  margin: 0;
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
 }
 
-.label {
-  margin: 0;
+.logo-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: var(--lime);
+  color: var(--ink);
+  border: var(--border);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.logo-icon .pixel-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.logo-text {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.logo-dot {
+  margin-left: 2px;
+  padding: 2px 4px;
+  background: var(--purple);
+  color: #fff;
+}
+
+.today {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  text-transform: uppercase;
   color: var(--muted);
-  font-size: 0.9rem;
+  text-align: right;
 }
 
-/* ---------- Balance ---------- */
-.balance-card {
-  text-align: center;
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
-.balance {
-  margin: 4px 0 0;
-  font-size: 2.2rem;
-  font-weight: 700;
-}
-
-/* ---------- Amount colors ---------- */
-.income {
-  color: var(--income);
-}
-
-.expense {
-  color: var(--expense);
-}
-
-/* ---------- "Expense / Income" switch ---------- */
-.type-switch {
+.tab {
+  position: relative;
   display: flex;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 8px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  line-height: 1.6;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--card);
+  border: var(--border);
+  box-shadow: 4px 4px 0 var(--shadow);
+  cursor: pointer;
 }
 
-.type-switch label {
+.tab .pixel-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+/* The open tab is "inverted": dark background, light text */
+.tab[aria-selected="true"] {
+  background: var(--text);
+  color: var(--paper);
+}
+
+/* Pressing a button pushes it into its shadow */
+.tab:active,
+.btn:active,
+.icon-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--shadow);
+}
+
+/* Little rotated "Soon" sticker on the tab */
+.sticker {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  padding: 4px 6px;
+  font-size: 8px;
+  background: var(--yellow);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  transform: rotate(6deg);
+}
+
+
+/* ---------- Cards ---------- */
+.card {
+  margin-bottom: 28px;
+  background: var(--card);
+  border: var(--border);
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+
+/* Colored title bar, like a window on an old computer */
+.card-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--ink);
+  border-bottom: var(--border);
+}
+
+.card-bar h2 {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  font-weight: normal;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Little square "close box" before the title */
+.card-bar::before {
+  content: "";
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ink);
+}
+
+/* Horizontal stripes after the title (they fill the free space) */
+.card-bar::after {
+  content: "";
   flex: 1;
+  height: 12px;
+  background: repeating-linear-gradient(to bottom, var(--ink) 0 2px, transparent 2px 4px);
+}
+
+.card-bar--lime { background: var(--lime); }
+.card-bar--yellow { background: var(--yellow); }
+.card-bar--pink { background: var(--pink); }
+.card-bar--violet { background: var(--violet); }
+
+.card-body {
+  padding: 16px 12px;
+}
+
+@media (min-width: 600px) {
+  .card-body {
+    padding: 20px;
+  }
+}
+
+
+/* ---------- Balance (the purple block at the top) ---------- */
+.hero {
+  padding: 22px 16px;
+  text-align: center;
+  color: #fff;
+  background-color: var(--purple);
+  /* A grid of small dots for a retro screen feeling */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+}
+
+.hero-label {
+  margin-bottom: 14px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.hero-amount {
+  font-family: var(--font-pixel);
+  /* clamp(min, preferred, max): the size grows with the screen, within limits */
+  font-size: clamp(18px, 6vw, 34px);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.hero-note {
+  margin-top: 12px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+
+/* ---------- Form ---------- */
+/* Which accent color the form uses: pink for expenses, lime for income */
+form[data-type="expense"] { --accent: var(--pink); }
+form[data-type="income"] { --accent: var(--lime); }
+
+.field {
+  display: block;
+  margin-bottom: 18px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+input,
+textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  font: inherit;
+  /* 16px — so the iPhone doesn't zoom in when you tap a field */
+  font-size: 16px;
+  color: var(--text);
+  background: var(--field);
+  border: var(--border);
+  border-radius: 0;
+}
+
+textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+/* "Expense / Income" switch */
+.switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 18px;
+  border: var(--border);
+}
+
+.switch label + label {
+  border-left: var(--border);
 }
 
 /* Hide the standard radio circles, but they keep working */
-.type-switch input {
+.switch input,
+.tile input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.type-switch span {
+.switch span {
   display: block;
+  padding: 12px 6px;
   text-align: center;
-  padding: 10px;
-  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  text-transform: uppercase;
   color: var(--muted);
-  font-weight: 600;
+  cursor: pointer;
 }
 
 /* ":checked + span" means: the span right after the selected radio button */
-.type-switch input[value="expense"]:checked + span {
-  background: var(--expense);
-  color: #fff;
+.switch input:checked + span {
+  background: var(--accent);
+  color: var(--ink);
 }
 
-.type-switch input[value="income"]:checked + span {
-  background: var(--income);
-  color: #fff;
+.switch input:focus-visible + span,
+.tile input:focus-visible + .tile-face {
+  outline: 3px dashed var(--focus);
+  outline-offset: -7px;
 }
 
-/* Outline when the switch is selected with the keyboard (Tab) */
-.type-switch input:focus-visible + span {
-  outline: 2px solid var(--accent);
-  outline-offset: -4px;
+/* Category tiles: 5 per row */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
 }
 
-/* ---------- Form fields ---------- */
-/* grid: on phones the fields go one under another, on wide screens two per row */
-.form-grid {
+.tile {
+  position: relative;
+}
+
+.tile-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 2px 8px;
+  color: var(--text);
+  background: var(--field);
+  border: 2px solid var(--line);
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.tile-face .pixel-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.tile-name {
+  max-width: 100%;
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile:hover .tile-face {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+/* The selected tile pops out and gets the accent color */
+.tile input:checked + .tile-face {
+  color: var(--ink);
+  background: var(--accent);
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+/* Live chips preview under the text box */
+.preview {
+  margin: -6px 0 18px;
+  padding: 10px;
+  border: 2px dashed var(--soft-line);
+}
+
+.preview-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.preview-total {
+  margin-top: 12px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.preview-warning,
+.form-error {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+}
+
+.preview-warning {
+  margin-top: 10px;
+  background: var(--yellow);
+}
+
+.form-error {
+  margin-bottom: 18px;
+  background: var(--pink);
+}
+
+/* Date and the button: one under another on phones, side by side on wide screens */
+.form-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  align-items: end;
+}
+
+.form-row .field {
+  margin-bottom: 0;
 }
 
 @media (min-width: 560px) {
-  .form-grid {
+  .form-row {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-input,
-select {
-  font: inherit;
-  /* 16px — so the iPhone doesn't zoom in when you tap a field */
-  font-size: 16px;
-  color: var(--text);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  width: 100%;
-  min-width: 0;
-}
-
-input:focus,
-select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-
-#month {
-  width: auto;
-}
 
 /* ---------- Buttons ---------- */
-.btn-primary {
+.btn {
   width: 100%;
-  font: inherit;
-  font-weight: 600;
-  padding: 12px;
-  border: none;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: #fff;
+  padding: 15px 16px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--lime);
+  border: var(--border);
+  box-shadow: 4px 4px 0 var(--shadow);
   cursor: pointer;
 }
 
-.btn-primary:hover {
-  filter: brightness(1.08);
+.btn:hover,
+.tab:hover {
+  filter: brightness(1.05);
 }
 
-.btn-delete {
+/* Small square buttons with an icon (month arrows, delete) */
+.icon-button {
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-  font-size: 1.2rem;
-  line-height: 1;
   width: 36px;
   height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--muted);
+  padding: 0;
+  color: var(--text);
+  background: var(--field);
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 var(--shadow);
   cursor: pointer;
 }
 
-.btn-delete:hover {
-  color: var(--expense);
-  border-color: var(--expense);
+.icon-button .pixel-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
-/* ---------- Monthly summary ---------- */
-.month-totals {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.icon-button:hover {
+  color: var(--ink);
+  background: var(--yellow);
 }
 
-.month-totals > div {
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 12px;
+.icon-button--danger .pixel-icon {
+  width: 12px;
+  height: 12px;
 }
 
-.amount {
-  margin: 2px 0 0;
-  font-size: 1.25rem;
+.icon-button--danger:hover {
+  background: var(--pink);
+}
+
+
+/* ---------- Chips ("bananas ₴60") ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 1.2;
+  background: var(--field);
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.chip-name {
+  padding: 4px 8px;
+  overflow-wrap: anywhere;
+}
+
+.chip-price {
+  padding: 4px 8px;
   font-weight: 700;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--yellow);
 }
 
-/* ---------- Category list ---------- */
+/* A line between the name and the price (only when there is a name) */
+.chip-name + .chip-price {
+  border-left: 2px solid var(--line);
+}
+
+
+/* ---------- Month summary ---------- */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.month-label {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.stat {
+  padding: 10px 8px;
+  color: var(--ink);
+  border: var(--border);
+}
+
+.stat--in { background: var(--lime); }
+.stat--out { background: var(--pink); }
+.stat--net { background: var(--violet); }
+
+.stat-label {
+  margin-bottom: 8px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: clamp(12px, 3.3vw, 16px);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.section-title {
+  margin: 0 0 14px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
 /* list-style: none removes the list bullets */
-.category-list,
-.record-list {
+.spend-list,
+.history,
+.day-entries {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.category-item {
-  padding: 8px 0;
-}
-
-.category-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-/* Gray track on which the category share bar is drawn */
-.category-bar {
-  height: 6px;
-  background: var(--bg);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.category-bar-fill {
-  height: 100%;
-  background: var(--expense);
-  border-radius: 3px;
-}
-
-/* ---------- Entry list ---------- */
-.record-item {
-  display: flex;
-  align-items: center;
+.spend-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid var(--border);
+  padding: 16px 0;
+  border-top: 2px dashed var(--soft-line);
 }
 
-.record-item:first-child {
+.spend-row:first-child {
+  padding-top: 0;
   border-top: none;
 }
 
-/* Left part of an entry (category, date, comment) takes all the free space */
-.record-info {
+.spend-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.meter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+/* Pixel progress bar made of separate blocks */
+.meter {
   flex: 1;
-  min-width: 0;
+  height: 16px;
+  padding: 2px;
+  background: var(--field);
+  border: 2px solid var(--line);
 }
 
-.record-category {
-  margin: 0;
-  font-weight: 600;
+.meter-fill {
+  height: 100%;
+  /* Pink 6px blocks with 2px gaps between them */
+  background: repeating-linear-gradient(90deg, var(--pink) 0 6px, transparent 6px 8px);
 }
 
-.record-meta {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: var(--muted);
-  /* A long comment wraps instead of going off the screen */
-  overflow-wrap: anywhere;
+.meter-percent {
+  min-width: 4ch;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  text-align: right;
 }
 
-.record-amount {
-  margin: 0;
+
+/* ---------- Colored icon squares ---------- */
+.icon-tile {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  color: var(--ink);
+  border: 2px solid var(--line);
+}
+
+.icon-tile .pixel-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.icon-tile--expense { background: var(--pink); }
+.icon-tile--income { background: var(--lime); }
+
+
+/* ---------- History ---------- */
+#history-note {
+  margin-bottom: 16px;
+}
+
+.day + .day {
+  margin-top: 20px;
+}
+
+.day-title {
+  display: inline-block;
+  margin: 0 0 4px;
+  padding: 6px 8px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: normal;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--text);
+}
+
+/* One entry. grid-template-areas places the parts like a little map:
+   icon | name  | amount | delete
+   icon | chips | chips  | chips  */
+.entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "icon name amount delete"
+    "icon chips chips chips";
+  column-gap: 10px;
+  row-gap: 8px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 2px dashed var(--soft-line);
+}
+
+.entry:last-child {
+  border-bottom: none;
+}
+
+.entry .icon-tile { grid-area: icon; align-self: start; }
+.entry-name { grid-area: name; font-weight: 700; overflow-wrap: anywhere; }
+.entry .amount { grid-area: amount; }
+.entry .icon-button { grid-area: delete; }
+.entry-chips { grid-area: chips; }
+
+.amount {
+  padding: 3px 6px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
+  color: var(--ink);
+  border: 2px solid var(--ink);
 }
 
-/* "No entries yet" text */
+.amount--expense { background: var(--pink); }
+.amount--income { background: var(--lime); }
+
+/* "Nothing here yet" */
 .empty {
-  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 8px;
+  font-size: 13px;
   text-align: center;
-  padding: 12px 0;
-  margin: 0;
+  color: var(--muted);
+}
+
+.empty .pixel-icon {
+  width: 36px;
+  height: 36px;
+  opacity: 0.5;
+}
+
+
+/* ---------- Habits & Plans placeholder ---------- */
+.soon {
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.soon-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  color: var(--ink);
+  background: var(--violet);
+  border: var(--border);
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+
+.soon-icon .pixel-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.soon-title {
+  margin-bottom: 14px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.soon-list {
+  display: inline-grid;
+  gap: 12px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+/* An empty pixel checkbox before every planned feature */
+.soon-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.soon-list li::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: var(--field);
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+
+/* ---------- Footer and toast ---------- */
+.footer {
+  font-size: 12px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  max-width: calc(100% - 32px);
+  padding: 12px 14px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--lime);
+  border: var(--border);
+  box-shadow: 4px 4px 0 var(--shadow);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 16px);
+  /* steps() makes the movement jumpy, like in old games */
+  transition: opacity 0.15s, transform 0.2s steps(4);
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* If the device asks for less motion, turn animations off */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
 }
