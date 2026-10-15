@@ -1,44 +1,41 @@
 // =========================================================
-// Трекер бюджету
-// Тут уся логіка: додавання й видалення записів, підрахунки,
-// збереження даних у браузері.
-//
-// Рядки беремо в подвійні лапки "…", бо в українських словах
-// буває апостроф (Зв'язок), і одинарні лапки з ним конфліктували б.
+// Budget tracker
+// All the logic lives here: adding and deleting entries,
+// calculations, and saving data in the browser.
 // =========================================================
 
 
-// ---------- 1. Налаштування ----------
+// ---------- 1. Settings ----------
 
-// Назва, під якою дані зберігаються в localStorage браузера
+// The name under which the data is saved in the browser's localStorage
 const STORAGE_KEY = "budget-records";
 
-// Категорії. Щоб додати свою, просто допиши її в потрібний список.
+// Categories. To add your own, just add it to the right list.
 const CATEGORIES = {
   expense: [
-    "Продукти",
-    "Кафе та ресторани",
-    "Транспорт",
-    "Житло та комуналка",
-    "Зв'язок та інтернет",
-    "Здоров'я",
-    "Одяг",
-    "Розваги",
-    "Подарунки",
-    "Інше",
+    "Groceries",
+    "Cafes & restaurants",
+    "Transport",
+    "Housing & utilities",
+    "Phone & internet",
+    "Health",
+    "Clothing",
+    "Entertainment",
+    "Gifts",
+    "Other",
   ],
   income: [
-    "Зарплата",
-    "Підробіток",
-    "Подарунок",
-    "Кешбек і відсотки",
-    "Інше",
+    "Salary",
+    "Side job",
+    "Gift",
+    "Cashback & interest",
+    "Other",
   ],
 };
 
 
-// ---------- 2. Знаходимо потрібні елементи на сторінці ----------
-// document.getElementById("...") шукає елемент з таким id в index.html
+// ---------- 2. Find the elements we need on the page ----------
+// document.getElementById("...") finds the element with that id in index.html
 
 const form = document.getElementById("record-form");
 const amountInput = document.getElementById("amount");
@@ -54,92 +51,102 @@ const categoryList = document.getElementById("category-list");
 const recordList = document.getElementById("record-list");
 
 
-// ---------- 3. Дані ----------
-// records — це масив (список) усіх записів. Один запис виглядає так:
+// ---------- 3. Data ----------
+// records is an array (a list) of all entries. One entry looks like this:
 // {
-//   id: "lx3k9a1b2",        — унікальний номер, щоб знати, що видаляти
-//   type: "expense",        — "expense" (витрата) або "income" (дохід)
-//   amount: 150.5,          — сума в гривнях
-//   category: "Продукти",
-//   date: "2026-10-15",     — дата у форматі рік-місяць-день
-//   comment: "АТБ"
+//   id: "lx3k9a1b2",        — a unique id, so we know which entry to delete
+//   type: "expense",        — "expense" or "income"
+//   amount: 150.5,          — amount in hryvnias
+//   category: "Groceries",
+//   date: "2026-10-15",     — date in year-month-day format
+//   comment: "Supermarket"
 // }
 
 let records = loadRecords();
 
-// Читає записи з localStorage. Якщо там порожньо або щось зламане — повертає порожній список.
+// Reads entries from localStorage. If it's empty or broken, returns an empty list.
 function loadRecords() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) {
       return [];
     }
-    // localStorage зберігає лише текст, тому перетворюємо текст назад у масив
+    // localStorage can only store text, so we turn the text back into an array
     const parsed = JSON.parse(saved);
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
-    console.error("Не вдалося прочитати дані:", error);
+    console.error("Could not read data:", error);
     return [];
   }
 }
 
-// Записує всі записи в localStorage (перетворивши масив у текст)
+// Saves all entries to localStorage (after turning the array into text)
 function saveRecords() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   } catch (error) {
-    console.error("Не вдалося зберегти дані:", error);
-    alert("Не вдалося зберегти дані. Можливо, браузер у приватному режимі або сховище заповнене.");
+    console.error("Could not save data:", error);
+    alert("Could not save data. The browser may be in private mode, or the storage is full.");
   }
 }
 
 
-// ---------- 4. Допоміжні функції ----------
+// ---------- 4. Helper functions ----------
 
-// Формат чисел для України: 1234.5 → "1 234,50"
-const numberFormat = new Intl.NumberFormat("uk-UA", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+// Money format: 1234.5 → "₴1,234.50"
+const moneyFormat = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "UAH",
+  currencyDisplay: "narrowSymbol", // show "₴" instead of "UAH"
 });
 
-// Перетворює число на гроші: 1234.5 → "1 234,50 ₴"
+// Turns a number into money text: 1234.5 → "₴1,234.50"
 function formatMoney(amount) {
-  // Округлюємо до копійок. «|| 0» прибирає дивний «мінус нуль» (-0),
-  // який іноді виникає під час обчислень і показувався б як "-0,00"
+  // Round to kopiykas (cents). "|| 0" removes the odd "minus zero" (-0)
+  // that calculations sometimes produce, which would show as "-₴0.00"
   const rounded = Math.round(amount * 100) / 100 || 0;
-  return numberFormat.format(rounded) + " ₴";
+  return moneyFormat.format(rounded);
 }
 
-// Перетворює дату "2026-10-15" на звичний вигляд "15.10.2026"
+// Date format: "Oct 15, 2026"
+const dateFormat = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+// Turns the date "2026-10-15" into "Oct 15, 2026"
 function formatDate(dateString) {
-  const [year, month, day] = dateString.split("-");
-  return day + "." + month + "." + year;
+  // split("-") cuts the text into parts, map(Number) turns each part into a number
+  const [year, month, day] = dateString.split("-").map(Number);
+  // In JavaScript, months start from zero (January = 0), so we subtract 1
+  return dateFormat.format(new Date(year, month - 1, day));
 }
 
-// Повертає сьогоднішню дату у форматі "2026-10-15"
+// Returns today's date in the "2026-10-15" format
 function todayString() {
   const now = new Date();
   const year = now.getFullYear();
-  // getMonth() рахує місяці з нуля (січень = 0), тому додаємо 1.
-  // padStart(2, "0") додає нуль спереду: "5" → "05"
+  // getMonth() counts months from zero (January = 0), so we add 1.
+  // padStart(2, "0") adds a leading zero: "5" → "05"
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   return year + "-" + month + "-" + day;
 }
 
-// Поточний місяць у форматі "2026-10" (перші 7 символів дати)
+// The current month in the "2026-10" format (the first 7 characters of the date)
 function currentMonth() {
   return todayString().slice(0, 7);
 }
 
-// Створює унікальний id з поточного часу та випадкових символів
+// Creates a unique id from the current time and some random characters
 function createId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// Створює HTML-елемент із класом і текстом.
-// Використовуємо textContent (а не innerHTML) — це безпечно:
-// якщо в коментарі будуть символи на кшталт <b>, вони покажуться як звичайний текст.
+// Creates an HTML element with a class and text.
+// We use textContent (not innerHTML) because it's safe:
+// if a comment contains something like <b>, it is shown as plain text.
 function makeElement(tag, className, text) {
   const element = document.createElement(tag);
   if (className) {
@@ -151,14 +158,14 @@ function makeElement(tag, className, text) {
   return element;
 }
 
-// Який тип зараз вибрано в перемикачі: "expense" або "income"
+// Which type is selected in the switch right now: "expense" or "income"
 function getSelectedType() {
   return form.querySelector('input[name="type"]:checked').value;
 }
 
-// Заповнює випадаючий список категорій для вибраного типу
+// Fills the category dropdown for the selected type
 function fillCategories(type) {
-  categorySelect.innerHTML = ""; // спершу очищаємо старі варіанти
+  categorySelect.innerHTML = ""; // first remove the old options
   for (const name of CATEGORIES[type]) {
     const option = makeElement("option", "", name);
     option.value = name;
@@ -167,24 +174,24 @@ function fillCategories(type) {
 }
 
 
-// ---------- 5. Дії користувача ----------
+// ---------- 5. User actions ----------
 
-// Коли перемикаємо «Витрата / Дохід» — міняємо список категорій
+// When we switch "Expense / Income", change the category list
 for (const radio of form.querySelectorAll('input[name="type"]')) {
   radio.addEventListener("change", () => {
     fillCategories(getSelectedType());
   });
 }
 
-// Коли натискаємо «Додати»
+// When we click "Add"
 form.addEventListener("submit", (event) => {
-  // За замовчуванням форма перезавантажує сторінку — забороняємо це
+  // By default a form reloads the page — we stop that
   event.preventDefault();
 
-  // Перетворюємо введений текст на число і округлюємо до копійок
+  // Turn the typed text into a number and round it to kopiykas
   const amount = Math.round(Number(amountInput.value) * 100) / 100;
   if (!(amount > 0)) {
-    alert("Введи суму, більшу за нуль.");
+    alert("Enter an amount greater than zero.");
     return;
   }
 
@@ -194,55 +201,55 @@ form.addEventListener("submit", (event) => {
     amount: amount,
     category: categorySelect.value,
     date: dateInput.value,
-    comment: commentInput.value.trim(), // trim() прибирає зайві пробіли по краях
+    comment: commentInput.value.trim(), // trim() removes extra spaces at the edges
   };
 
-  records.push(record); // додаємо в кінець списку
+  records.push(record); // add to the end of the list
   saveRecords();
 
-  // Очищаємо лише суму й коментар. Тип, категорію й дату лишаємо —
-  // так зручніше вносити кілька схожих записів поспіль.
+  // Clear only the amount and comment. Keep the type, category and date —
+  // that makes it easier to add several similar entries in a row.
   amountInput.value = "";
   commentInput.value = "";
   amountInput.focus();
 
-  // Показуємо підсумки за місяць, у який щойно додали запис
+  // Show the summary for the month we just added an entry to
   monthInput.value = record.date.slice(0, 7);
 
   render();
 });
 
-// Коли змінюємо місяць — перераховуємо підсумки
+// When the month changes, recalculate the summary
 monthInput.addEventListener("change", () => {
-  // Якщо поле очистили — повертаємо поточний місяць
+  // If the field was cleared, go back to the current month
   if (!monthInput.value) {
     monthInput.value = currentMonth();
   }
   renderMonthSummary();
 });
 
-// Видаляє запис за його id (після підтвердження)
+// Deletes an entry by its id (after confirmation)
 function deleteRecord(id) {
-  if (!confirm("Видалити цей запис?")) {
+  if (!confirm("Delete this entry?")) {
     return;
   }
-  // filter залишає всі записи, КРІМ того, у якого такий id
+  // filter keeps all entries EXCEPT the one with this id
   records = records.filter((record) => record.id !== id);
   saveRecords();
   render();
 }
 
 
-// ---------- 6. Відображення (малюємо дані на сторінці) ----------
+// ---------- 6. Rendering (drawing the data on the page) ----------
 
-// Головна функція: оновлює всі блоки сторінки
+// Main function: updates every block on the page
 function render() {
   renderBalance();
   renderMonthSummary();
   renderRecordList();
 }
 
-// Баланс = усі доходи мінус усі витрати (за весь час)
+// Balance = all income minus all expenses (for all time)
 function renderBalance() {
   let balance = 0;
   for (const record of records) {
@@ -253,20 +260,20 @@ function renderBalance() {
     }
   }
   balanceEl.textContent = formatMoney(balance);
-  // Якщо баланс від'ємний — фарбуємо його в червоний
+  // If the balance is negative, color it red
   balanceEl.classList.toggle("expense", balance < -0.004);
 }
 
-// Доходи, витрати та витрати по категоріях за вибраний місяць
+// Income, expenses and expenses by category for the selected month
 function renderMonthSummary() {
-  const month = monthInput.value; // наприклад "2026-10"
+  const month = monthInput.value; // for example "2026-10"
 
   let income = 0;
   let expense = 0;
-  const byCategory = {}; // тут буде щось на кшталт { "Продукти": 1200, "Транспорт": 300 }
+  const byCategory = {}; // will look like { "Groceries": 1200, "Transport": 300 }
 
   for (const record of records) {
-    // Пропускаємо записи з інших місяців
+    // Skip entries from other months
     if (!record.date.startsWith(month)) {
       continue;
     }
@@ -274,7 +281,7 @@ function renderMonthSummary() {
       income += record.amount;
     } else {
       expense += record.amount;
-      // Якщо такої категорії ще немає — починаємо з 0, потім додаємо суму
+      // If this category isn't there yet, start from 0, then add the amount
       byCategory[record.category] = (byCategory[record.category] || 0) + record.amount;
     }
   }
@@ -282,17 +289,17 @@ function renderMonthSummary() {
   monthIncomeEl.textContent = formatMoney(income);
   monthExpenseEl.textContent = formatMoney(expense);
 
-  // Перетворюємо об'єкт на список пар [категорія, сума] і сортуємо: найбільші витрати зверху
+  // Turn the object into a list of [category, amount] pairs and sort it: biggest expenses first
   const sorted = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
 
   categoryList.innerHTML = "";
   if (sorted.length === 0) {
-    categoryList.appendChild(makeElement("li", "empty", "Витрат за цей місяць немає"));
+    categoryList.appendChild(makeElement("li", "empty", "No expenses this month"));
     return;
   }
 
   for (const [category, sum] of sorted) {
-    // Яку частку (у відсотках) ця категорія займає від усіх витрат місяця
+    // What share (in percent) this category takes of all the month's expenses
     const percent = Math.round((sum / expense) * 100);
 
     const item = makeElement("li", "category-item");
@@ -301,7 +308,7 @@ function renderMonthSummary() {
     row.appendChild(makeElement("span", "", category));
     row.appendChild(makeElement("span", "", formatMoney(sum) + " · " + percent + "%"));
 
-    // Смужка, довжина якої дорівнює відсотку
+    // A bar whose length equals the percentage
     const bar = makeElement("div", "category-bar");
     const fill = makeElement("div", "category-bar-fill");
     fill.style.width = percent + "%";
@@ -313,18 +320,18 @@ function renderMonthSummary() {
   }
 }
 
-// Список усіх записів: нові дати зверху
+// List of all entries: newest dates on top
 function renderRecordList() {
   recordList.innerHTML = "";
 
   if (records.length === 0) {
-    recordList.appendChild(makeElement("li", "empty", "Записів поки немає. Додай перший!"));
+    recordList.appendChild(makeElement("li", "empty", "No entries yet. Add your first one!"));
     return;
   }
 
-  // slice() робить копію, reverse() ставить останні додані першими,
-  // а sort() упорядковує за датою (новіші зверху). Записи з однаковою датою
-  // зберігають порядок після reverse(), тож щойно доданий буде вище.
+  // slice() makes a copy, reverse() puts the most recently added first,
+  // and sort() orders by date (newest on top). Entries with the same date
+  // keep their order from reverse(), so the one you just added is higher.
   const sorted = records
     .slice()
     .reverse()
@@ -333,7 +340,7 @@ function renderRecordList() {
   for (const record of sorted) {
     const item = makeElement("li", "record-item");
 
-    // Ліва частина: категорія, дата, коментар
+    // Left part: category, date, comment
     const info = makeElement("div", "record-info");
     info.appendChild(makeElement("p", "record-category", record.category));
     let meta = formatDate(record.date);
@@ -342,7 +349,7 @@ function renderRecordList() {
     }
     info.appendChild(makeElement("p", "record-meta", meta));
 
-    // Сума: зелена з «+» для доходу, червона з «−» для витрати
+    // Amount: green with "+" for income, red with "−" for expenses
     const isIncome = record.type === "income";
     const sign = isIncome ? "+" : "−";
     const amountEl = makeElement(
@@ -351,11 +358,11 @@ function renderRecordList() {
       sign + formatMoney(record.amount)
     );
 
-    // Кнопка видалення
+    // Delete button
     const deleteButton = makeElement("button", "btn-delete", "×");
     deleteButton.type = "button";
-    deleteButton.title = "Видалити запис";
-    deleteButton.setAttribute("aria-label", "Видалити запис");
+    deleteButton.title = "Delete entry";
+    deleteButton.setAttribute("aria-label", "Delete entry");
     deleteButton.addEventListener("click", () => deleteRecord(record.id));
 
     item.appendChild(info);
@@ -366,8 +373,8 @@ function renderRecordList() {
 }
 
 
-// ---------- 7. Запуск ----------
-// Це виконується один раз, коли сторінка відкривається
+// ---------- 7. Start ----------
+// This runs once, when the page opens
 
 fillCategories(getSelectedType());
 dateInput.value = todayString();

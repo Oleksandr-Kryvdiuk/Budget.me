@@ -1,30 +1,32 @@
-# Мій трекер
+# My Tracker
 
-Особистий трекер, який працює просто в браузері — без сервера і без встановлення.
+A personal tracker that runs right in the browser — no server, nothing to install.
 
-## Що вміє зараз
+**Live:** https://oleksandr-kryvdiuk.github.io/my-tracker/
 
-**Бюджет:**
-- додавання доходів і витрат (сума, категорія, дата, коментар);
-- список усіх записів з можливістю видалення;
-- поточний баланс;
-- доходи, витрати та витрати по категоріях за вибраний місяць.
+## Features
 
-Валюта — гривня (₴). Дані зберігаються в `localStorage` браузера, тобто лише на тому пристрої й у тому браузері, де їх внесли.
+**Budget:**
+- add income and expenses (amount, category, date, comment);
+- list of all entries, each one can be deleted;
+- current balance;
+- income, expenses and expenses by category for a selected month.
 
-## Файли
+Currency: Ukrainian hryvnia (₴). Data is stored in the browser's `localStorage`, so it lives only on the device and in the browser where it was entered.
 
-| Файл | Що в ньому |
-|------|------------|
-| `index.html` | структура сторінки |
-| `style.css` | зовнішній вигляд |
-| `budget.js` | логіка трекера бюджету |
+## Files
 
-## Як запустити
+| File | What's inside |
+|------|---------------|
+| `index.html` | page structure |
+| `style.css` | page styles |
+| `budget.js` | budget tracker logic |
 
-Відкрий `index.html` у браузері (подвійний клік по файлу).
+## How to run
 
-## Плани
+Open `index.html` in a browser (double-click the file).
 
-- список планів;
-- нагадування.
+## Roadmap
+
+- to-do / plans list;
+- reminders.

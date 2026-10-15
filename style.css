@@ -1,20 +1,20 @@
 /* =========================================================
-   Кольори та розміри винесені в «змінні» (--назва).
-   Щоб змінити колір усюди одразу, достатньо поміняти його тут.
+   Colors and sizes are stored in "variables" (--name).
+   To change a color everywhere at once, just change it here.
    ========================================================= */
 :root {
-  --bg: #f4f5f7;          /* фон сторінки */
-  --card: #ffffff;        /* фон карток */
-  --text: #1f2328;        /* основний текст */
-  --muted: #6b7280;       /* сірий другорядний текст */
-  --border: #e3e5e8;      /* лінії та рамки */
-  --accent: #3b6fd8;      /* головний колір (кнопки) */
-  --income: #1f8a4c;      /* зелений для доходів */
-  --expense: #d0453a;     /* червоний для витрат */
-  --radius: 12px;         /* заокруглення кутів */
+  --bg: #f4f5f7;          /* page background */
+  --card: #ffffff;        /* card background */
+  --text: #1f2328;        /* main text */
+  --muted: #6b7280;       /* gray secondary text */
+  --border: #e3e5e8;      /* lines and borders */
+  --accent: #3b6fd8;      /* main color (buttons) */
+  --income: #1f8a4c;      /* green for income */
+  --expense: #d0453a;     /* red for expenses */
+  --radius: 12px;         /* corner rounding */
 }
 
-/* Темна тема: вмикається сама, якщо на пристрої увімкнено темний режим */
+/* Dark theme: turns on automatically if the device uses dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #121417;
@@ -28,7 +28,7 @@
   }
 }
 
-/* box-sizing: border-box — щоб відступи всередині не збільшували розмір елемента */
+/* box-sizing: border-box — so that inner padding doesn't make elements bigger */
 * {
   box-sizing: border-box;
 }
@@ -41,7 +41,7 @@ body {
   line-height: 1.4;
 }
 
-/* ---------- Шапка ---------- */
+/* ---------- Header ---------- */
 .page-header {
   text-align: center;
   padding: 24px 16px 8px;
@@ -57,8 +57,8 @@ body {
   color: var(--muted);
 }
 
-/* ---------- Основний контейнер ---------- */
-/* max-width не дає сторінці розтягуватися надто широко на великому екрані */
+/* ---------- Main container ---------- */
+/* max-width keeps the page from stretching too wide on big screens */
 .container {
   max-width: 720px;
   margin: 0 auto;
@@ -68,7 +68,7 @@ body {
   gap: 16px;
 }
 
-/* ---------- Картки (білі блоки) ---------- */
+/* ---------- Cards (the white blocks) ---------- */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -107,7 +107,7 @@ body {
   font-size: 0.9rem;
 }
 
-/* ---------- Баланс ---------- */
+/* ---------- Balance ---------- */
 .balance-card {
   text-align: center;
 }
@@ -118,7 +118,7 @@ body {
   font-weight: 700;
 }
 
-/* ---------- Кольори сум ---------- */
+/* ---------- Amount colors ---------- */
 .income {
   color: var(--income);
 }
@@ -127,7 +127,7 @@ body {
   color: var(--expense);
 }
 
-/* ---------- Перемикач «Витрата / Дохід» ---------- */
+/* ---------- "Expense / Income" switch ---------- */
 .type-switch {
   display: flex;
   border: 1px solid var(--border);
@@ -140,7 +140,7 @@ body {
   flex: 1;
 }
 
-/* Ховаємо стандартні кружечки радіокнопок, але вони продовжують працювати */
+/* Hide the standard radio circles, but they keep working */
 .type-switch input {
   position: absolute;
   opacity: 0;
@@ -156,7 +156,7 @@ body {
   font-weight: 600;
 }
 
-/* «:checked + span» означає: span, що стоїть одразу після вибраної радіокнопки */
+/* ":checked + span" means: the span right after the selected radio button */
 .type-switch input[value="expense"]:checked + span {
   background: var(--expense);
   color: #fff;
@@ -167,14 +167,14 @@ body {
   color: #fff;
 }
 
-/* Рамка, коли перемикач вибрано клавіатурою (Tab) */
+/* Outline when the switch is selected with the keyboard (Tab) */
 .type-switch input:focus-visible + span {
   outline: 2px solid var(--accent);
   outline-offset: -4px;
 }
 
-/* ---------- Поля форми ---------- */
-/* grid — сітка: на телефоні поля йдуть одне під одним, на широкому екрані — по два в ряд */
+/* ---------- Form fields ---------- */
+/* grid: on phones the fields go one under another, on wide screens two per row */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -199,7 +199,7 @@ body {
 input,
 select {
   font: inherit;
-  /* 16px — щоб iPhone не збільшував сторінку при натисканні на поле */
+  /* 16px — so the iPhone doesn't zoom in when you tap a field */
   font-size: 16px;
   color: var(--text);
   background: var(--card);
@@ -220,7 +220,7 @@ select:focus {
   width: auto;
 }
 
-/* ---------- Кнопки ---------- */
+/* ---------- Buttons ---------- */
 .btn-primary {
   width: 100%;
   font: inherit;
@@ -255,7 +255,7 @@ select:focus {
   border-color: var(--expense);
 }
 
-/* ---------- Підсумки за місяць ---------- */
+/* ---------- Monthly summary ---------- */
 .month-totals {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -274,8 +274,8 @@ select:focus {
   font-weight: 700;
 }
 
-/* ---------- Список категорій ---------- */
-/* list-style: none прибирає крапочки списку */
+/* ---------- Category list ---------- */
+/* list-style: none removes the list bullets */
 .category-list,
 .record-list {
   list-style: none;
@@ -294,7 +294,7 @@ select:focus {
   margin-bottom: 4px;
 }
 
-/* Сіра доріжка, на якій малюється смужка частки категорії */
+/* Gray track on which the category share bar is drawn */
 .category-bar {
   height: 6px;
   background: var(--bg);
@@ -308,7 +308,7 @@ select:focus {
   border-radius: 3px;
 }
 
-/* ---------- Список записів ---------- */
+/* ---------- Entry list ---------- */
 .record-item {
   display: flex;
   align-items: center;
@@ -321,7 +321,7 @@ select:focus {
   border-top: none;
 }
 
-/* Ліва частина запису (категорія, дата, коментар) займає весь вільний простір */
+/* Left part of an entry (category, date, comment) takes all the free space */
 .record-info {
   flex: 1;
   min-width: 0;
@@ -336,7 +336,7 @@ select:focus {
   margin: 2px 0 0;
   font-size: 0.85rem;
   color: var(--muted);
-  /* Довгий коментар переноситься, а не вилазить за межі екрану */
+  /* A long comment wraps instead of going off the screen */
   overflow-wrap: anywhere;
 }
 
@@ -346,7 +346,7 @@ select:focus {
   white-space: nowrap;
 }
 
-/* Текст «Записів поки немає» */
+/* "No entries yet" text */
 .empty {
   color: var(--muted);
   text-align: center;

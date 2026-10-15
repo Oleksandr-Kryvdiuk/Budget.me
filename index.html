@@ -1,110 +1,110 @@
 <!DOCTYPE html>
-<!-- lang="uk" підказує браузеру, що сторінка українською -->
-<html lang="uk">
+<!-- lang="en" tells the browser that the page is in English -->
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Цей рядок потрібен, щоб сторінка нормально виглядала на телефоні -->
+  <!-- This line makes the page look right on phones -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Мій трекер</title>
-  <!-- Іконка вкладки браузера (емодзі гаманця) -->
+  <title>My Tracker</title>
+  <!-- Browser tab icon (a money bag emoji) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
-  <!-- Підключаємо файл зі стилями (зовнішній вигляд) -->
+  <!-- Connect the stylesheet (how the page looks) -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="page-header">
-    <h1>Мій трекер</h1>
-    <p class="subtitle">Бюджет</p>
+    <h1>My Tracker</h1>
+    <p class="subtitle">Budget</p>
   </header>
 
   <main class="container">
 
-    <!-- ===== Блок 1: Поточний баланс ===== -->
+    <!-- ===== Block 1: Current balance ===== -->
     <section class="card balance-card">
-      <p class="label">Поточний баланс</p>
-      <!-- Сюди JavaScript підставить суму. id потрібен, щоб знайти цей елемент у коді -->
-      <p id="balance" class="balance">0,00 ₴</p>
+      <p class="label">Current balance</p>
+      <!-- JavaScript puts the amount here. The id lets the code find this element -->
+      <p id="balance" class="balance">₴0.00</p>
     </section>
 
-    <!-- ===== Блок 2: Форма додавання запису ===== -->
+    <!-- ===== Block 2: Form for adding an entry ===== -->
     <section class="card">
-      <h2>Новий запис</h2>
+      <h2>New entry</h2>
 
       <form id="record-form">
-        <!-- Перемикач «Витрата / Дохід». Це радіокнопки: вибрати можна лише одну -->
+        <!-- "Expense / Income" switch. These are radio buttons: only one can be selected -->
         <div class="type-switch">
           <label>
             <input type="radio" name="type" value="expense" checked>
-            <span>Витрата</span>
+            <span>Expense</span>
           </label>
           <label>
             <input type="radio" name="type" value="income">
-            <span>Дохід</span>
+            <span>Income</span>
           </label>
         </div>
 
         <div class="form-grid">
           <label class="field">
-            <span>Сума, ₴</span>
-            <!-- inputmode="decimal" відкриває на телефоні цифрову клавіатуру -->
-            <input type="number" id="amount" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" required>
+            <span>Amount, ₴</span>
+            <!-- inputmode="decimal" opens the number keyboard on phones -->
+            <input type="number" id="amount" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required>
           </label>
 
           <label class="field">
-            <span>Категорія</span>
-            <!-- Список категорій заповнює JavaScript (він різний для доходів і витрат) -->
+            <span>Category</span>
+            <!-- JavaScript fills this list (it is different for income and expenses) -->
             <select id="category" required></select>
           </label>
 
           <label class="field">
-            <span>Дата</span>
+            <span>Date</span>
             <input type="date" id="date" required>
           </label>
 
           <label class="field">
-            <span>Коментар</span>
-            <input type="text" id="comment" maxlength="100" placeholder="Необов'язково">
+            <span>Comment</span>
+            <input type="text" id="comment" maxlength="100" placeholder="Optional">
           </label>
         </div>
 
-        <button type="submit" class="btn-primary">Додати</button>
+        <button type="submit" class="btn-primary">Add</button>
       </form>
     </section>
 
-    <!-- ===== Блок 3: Підсумки за місяць ===== -->
+    <!-- ===== Block 3: Monthly summary ===== -->
     <section class="card">
       <div class="card-header">
-        <h2>Підсумки за місяць</h2>
-        <!-- Поле для вибору місяця -->
+        <h2>Monthly summary</h2>
+        <!-- Month picker -->
         <input type="month" id="month">
       </div>
 
       <div class="month-totals">
         <div>
-          <p class="label">Доходи</p>
-          <p id="month-income" class="amount income">0,00 ₴</p>
+          <p class="label">Income</p>
+          <p id="month-income" class="amount income">₴0.00</p>
         </div>
         <div>
-          <p class="label">Витрати</p>
-          <p id="month-expense" class="amount expense">0,00 ₴</p>
+          <p class="label">Expenses</p>
+          <p id="month-expense" class="amount expense">₴0.00</p>
         </div>
       </div>
 
-      <h3>Витрати по категоріях</h3>
-      <!-- Сюди JavaScript додасть рядки з категоріями -->
+      <h3>Expenses by category</h3>
+      <!-- JavaScript adds a row for each category here -->
       <ul id="category-list" class="category-list"></ul>
     </section>
 
-    <!-- ===== Блок 4: Список усіх записів ===== -->
+    <!-- ===== Block 4: List of all entries ===== -->
     <section class="card">
-      <h2>Усі записи</h2>
+      <h2>All entries</h2>
       <ul id="record-list" class="record-list"></ul>
     </section>
 
   </main>
 
-  <!-- Підключаємо файл з логікою. Він стоїть в кінці, щоб на момент запуску
-       вся сторінка вище вже була завантажена -->
+  <!-- Connect the logic file. It goes at the very end so that the whole page
+       above is already loaded when the script starts -->
   <script src="budget.js"></script>
 </body>
 </html>
